@@ -1,7 +1,7 @@
 # python 3.7.8
 import argparse
 import os
-from parameters import BRISK, OUTPUT_FOLDER_IMAGES, resize
+from parameters import BRISK, OUTPUT_FOLDER_IMAGES
 import cv2 as cv  # '4.4.0'
 import numpy as np
 import pickle

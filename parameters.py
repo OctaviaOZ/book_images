@@ -4,8 +4,9 @@ import os
 
 BRISK = cv.BRISK_create(70, 2)  # norm = cv.NORM_HAMMING
 
-COVERS_FOLDER = os.path.sys.path[00]+'\\images\\covers'
-OUTPUT_FOLDER_IMAGES = os.path.sys.path[00]+'\\images'
+OUTPUT_FOLDER = os.path.sys.path[00]
+COVERS_FOLDER = OUTPUT_FOLDER+'\\images\\covers'
+OUTPUT_FOLDER_IMAGES = OUTPUT_FOLDER+'\\images'
 
 def resize(image: object = None, scale_factor: int = 500):
     """

@@ -1,6 +1,7 @@
-opencv-python
-python 3.7.8
+python #3.7.8
 
 numpy
-opencv-python 4.4.0
+opencv-python #4.4.0
 pickle
+fitz
+PyMuPDF
