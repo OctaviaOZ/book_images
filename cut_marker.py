@@ -1,9 +1,8 @@
 import argparse
 import os
-from parameters import OUTPUT_FOLDER, OUTPUT_FOLDER_IMAGES
+from settings.parameters import OUTPUT_FOLDER, OUTPUT_FOLDER_IMAGES
 import fitz
 import numpy as np
-
 
 def findmarker(image: object, marker_name: str):
 
@@ -21,6 +20,7 @@ def findmarker(image: object, marker_name: str):
         for img in doc.getPageImageList(i):
             xref = img[0]
             pix = fitz.Pixmap(doc, xref)
+
             pix_list.append(pix)
             pix_size.append(pix.size)
             pix = None
@@ -34,13 +34,13 @@ def findmarker(image: object, marker_name: str):
 
     idx = np.argmax(pix_size)
     pix = pix_list[idx]
-    if pix.n < 5:  # this is GRAY or RGB
-        pix.writePNG("%s%s_%s.png" % (folder_name, marker_name, name_image))
-    else:
-        pix1 = fitz.Pixmap(fitz.csRGB, pix)
-        pix.writePNG("%s%s_%s.png" % (folder_name, marker_name, name_image))
-        pix1 = None
 
+    if pix.n < 5:  # can be saved as PNG
+        pix.writeImage("%s%s_%s.jpg" % (folder_name, marker_name, name_image))
+    else:  # must convert the CMYK first
+        pix0 = fitz.Pixmap(fitz.csRGB, pix)
+        pix0.writeImage("%s%s_%s.png" % (folder_name, marker_name, name_image))
+        pix0 = None  # free Pixmap resources
     pix = None
     return 0
 
@@ -49,8 +49,8 @@ def main(folder_name: str, marker_name: str):
     isfolder = os.path.isdir(image_name)
 
     if isfolder:
-        for _, _, files in os.walk(folder_name):
-            for f in files:
+        files = os.listdir(folder_name)
+        for f in files:
                 if f.endswith('pdf'):
                     findmarker(folder_name + "\\" + f, marker_name)
     else:

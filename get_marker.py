@@ -1,9 +1,13 @@
-from parameters import BRISK, COVERS_FOLDER, OUTPUT_FOLDER_IMAGES, resize
+#!/usr/bin/env python
+# coding: utf-8
+
+from settings.parameters import COVERS_FOLDER, OUTPUT_FOLDER_IMAGES, resize, get_parameters
 import cv2 as cv  # '4.4.0'
 import argparse
 import os
 import numpy as np
 import pickle
+from timeit import default_timer as timer
 
 
 class Book:
@@ -79,20 +83,31 @@ class Book:
 
         def findmacth(image_file):
             print('\nprocessing', str(image_file))
+            start = timer()
 
-            original = cv.imread(image_file, cv.IMREAD_COLOR)
+            original = cv.imread(image_file, 1)
+
+            #1: cv2.IMREAD_COLOR
+            #0: cv2.IMREAD_GRAYSCALE
 
             if original is None:
                 print('\n' + image_file + " didn't find")
                 return ""
 
-            original = resize(original)
+            original = resize(original, size)
             original = cv.cvtColor(original, cv.COLOR_BGR2GRAY)
+
+            #original = cv.Canny(original, 100, 200)
+            #original = cv.equalizeHist(original)
 
             original[0] = original[0] / 255.
             original[1] = original[1] / 255.
 
-            _, desc_1 = BRISK.detectAndCompute(original, None)
+            # Apply gamma correction.
+            #original[0] = np.array(255 * (original[0] / 255) ** GAMMA, dtype='uint8')
+            #original[1] = np.array(255 * (original[1] / 255) ** GAMMA, dtype='uint8')
+
+            _, desc_1 = brisk.detectAndCompute(original, None)
 
             if desc_1 is not None:
                 titles = []
@@ -103,6 +118,7 @@ class Book:
 
                     good_points = 0
                     matches = flann.knnMatch(desc_1, desc_2, k=2)
+
                     for m_n in matches:
                         if len(m_n) != 2:
                             continue
@@ -111,7 +127,7 @@ class Book:
 
                     percentage_similarity = good_points / len_desc_2 * 100
 
-                    if percentage_similarity > 4:
+                    if percentage_similarity > 2:
                         titles.append(title)
                         similarity.append(percentage_similarity)
 
@@ -119,7 +135,11 @@ class Book:
                     idx = np.argmax(similarity)
                     #for idx1, t in enumerate(titles):
                     print("Info: " + str(titles[idx]))
-                    #    print("percentage_similarity: {0}".format(str(similarity[idx1])))
+                    #print("percentage_similarity: {0}".format(str(similarity[idx])))
+
+                    end = timer()
+                    print('find_match_time: ', (end - start))
+
                     if not self.isfolder:
                         return str(titles[idx])
                 else:
@@ -130,16 +150,31 @@ class Book:
             if not self.isfolder:
                 return ""
 
+        if not os.path.exists(self.descriptions):
+            print("\nDid not find file {}".format(self.descriptions))
+            return ""
+
         with open(self.descriptions, 'rb') as handle:
             root = pickle.load(handle)
 
         flann = cv.FlannBasedMatcher(self.index_params, {})
 
+        if self.iscover:
+            thresh, octaves, size = get_parameters("covers")
+        else:
+            thresh, octaves, size = get_parameters(self.current_book)
+
+        if not thresh:
+            return ""
+
+        brisk = cv.BRISK_create(thresh, octaves)  # norm = cv.NORM_HAMMING (70,2) 30days
+
         if self.isfolder:
-            for _, _, files in os.walk(self.image):
-                for f in files:
-                    if (f.endswith('.png')) | (f.endswith('.jpg')):
-                        findmacth(str(image) + "\\" + f)
+
+            files = os.listdir(self.image)
+            for f in files:
+                if f.endswith('.jpg'):
+                    findmacth(str(image) + "\\" + f)
             # cv_file.release()
         else:
             cur_book = findmacth(image)

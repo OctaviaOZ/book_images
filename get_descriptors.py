@@ -1,7 +1,7 @@
 # python 3.7.8
 import argparse
 import os
-from parameters import BRISK, OUTPUT_FOLDER_IMAGES
+from settings.parameters import OUTPUT_FOLDER_IMAGES, resize, get_parameters
 import cv2 as cv  # '4.4.0'
 import numpy as np
 import pickle
@@ -23,30 +23,35 @@ def main(folder_name: str):
     #cv_file = cv.FileStorage(image_path + folder_name + '.xml', cv.FILE_STORAGE_WRITE)
     #cv_file.startWriteStruct('Mapping', cv.FileNode_MAP)
 
+    thresh, octaves, size = get_parameters(folder_name)
+
+    if not thresh:
+        return 1
+
+    brisk = cv.BRISK_create(thresh, octaves)  # norm = cv.NORM_HAMMING (70,2) 30days (30, 4) 20days
+
     all_images_to_compare = []
-    for _, _, files in os.walk(IMAGE_PATH):
+    files = os.listdir(IMAGE_PATH)
+    for f in files:
+            if f.endswith('.jpg'):
 
-        for f in files:
-            if f.endswith('.png'):
+                image = cv.imread(IMAGE_PATH + f, 1)
+                image = resize(image, size)
+                #image = cv.Canny(image, 50, 100)
 
-                image = cv.imread(IMAGE_PATH + f, cv.IMREAD_COLOR)
                 image = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
 
                 image[0] = image[0] / 255.
                 image[1] = image[1] / 255.
 
-                #star = cv.xfeatures2d.StarDetector_create()
-                # Initiate BRIEF extractor
-                #brief = cv.xfeatures2d.BriefDescriptorExtractor_create()
-                # find the keypoints with STAR
-                #kp = star.detect(image, None)
-                # compute the descriptors with BRIEF
-                #_, desc = brief.compute(image, kp)
+                # Apply gamma correction.
+                #image[0] = np.array(255 * (image[0] / 255) ** GAMMA, dtype='uint8')
+                #image[1] = np.array(255 * (image[1] / 255) ** GAMMA, dtype='uint8')
 
-                _, desc = BRISK.detectAndCompute(image, None)
-                #cv_file.write(os.path.splitext(f)[0], desc)
+                _, desc = brisk.detectAndCompute(image, None)
                 if desc is not None:
                     all_images_to_compare.append((os.path.splitext(f)[0], desc, len(desc)))
+                    #print(len(desc))
                 else:
                     print("impossible to find point", IMAGE_PATH + f)
 
