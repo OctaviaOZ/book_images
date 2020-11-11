@@ -24,34 +24,39 @@
     
     Функція знаходить картинки на 1й сторінці та виводить більшу за розміром. Всі картинки по сторінках
     зберігаються у папці з ім'ям книги у загальній папці "images". Якщо папку не знайдено, функція її створить.
+    Маркери треба перевірити, деякі обрізати. При необхідності створити вручну.
 
 3. Запуск отримання дескріпторів відбувається шляхом запуску з папки проекту:
 
-	python get_descriptors.py --folder_name <name of book>
+    python get_descriptors.py --folder_name <name of book>
 
-		<name of book> - це назва папки (директорії) з маркерами-картинками окремої книги у форматі png, отримані з pdf-файлів.
+		<name of book> - це назва папки (директорії) з маркерами-картинками окремої книги у форматі 'jpg', отримані з pdf-файлів.
 
 	Приклад:
 
-	\Books_images> python get_descriptors.py --folder_name covers
+	python get_descriptors.py --folder_name covers
 
 	Функція збирає точки для розпізнавання та записує опис по кожній картинці в файл <folder_name>.pickle (файл з дескрипторами)
+	
+	У файлі specifications.json на кожну книгу прописуются параметри отримання дексрипторів. 
+    Ці параметри залежаль від типу зображень. В проекті є GRAY та CMYK зображення, в залежності від цього
+    встановлювалися параметри.
 
 
-3. Запуск отримання результату пошуку розпізнавання відбувається шляхом запуску з папки проекту в командній строці:
+4. Запуск отримання результату пошуку розпізнавання відбувається шляхом запуску з папки проекту у командному рядку:
 
-	\Books_images> python get_marker.py --folder_name <folder/image> / --cover <true>
+    python get_marker.py --folder_name <folder/image> / --cover <true>
 
 	
 	Приклади:
 
-	\Books_images> python get_marker.py --folder_name test\pages
-	\Books_images> python get_marker.py --folder_name test\pages\20201028_203639.jpg
-	\Books_images> python get_marker.py --folder_name test\20201028_203639.jpg --cover true
+	python get_marker.py --folder_name test\pages
+	python get_marker.py --folder_name test\pages\20201028_203639.jpg
+	python get_marker.py --folder_name test\20201028_203639.jpg --cover true
 
 
 	Передається папка чи файл в аргументі --folder_name. Якщо це обкладинка передається додатковий параметр --cover True, в іншому впадку він не об'язковий.
-	Файли приймаються у форматі jpg або png.
+	Файли приймаються у форматі jpg.
 
 	Алгоритм функції пошуку обкладинки чи поточної сторінки:
 
