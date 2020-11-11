@@ -3,8 +3,26 @@ import os
 from settings.parameters import OUTPUT_FOLDER, OUTPUT_FOLDER_IMAGES
 import fitz
 import numpy as np
+from PIL import Image
+import io
 
 def findmarker(image: object, marker_name: str):
+
+    def get_pix():
+        base_image = doc.extractImage(xref)
+        image_bytes = base_image["image"]
+        image = Image.open(io.BytesIO(image_bytes))
+        if 'DeviceCMYK' in base_image['cs-name']:
+
+            if 'Indexed' in base_image['cs-name']:
+                metric = image.entropy()/2
+            else:
+                metric = image.entropy()
+        else:
+            metric = image.height * image.width
+
+        return image, metric
+
 
     name_image = os.path.basename(image).split('.')[0]
     #split_name = os.path.split(image)
@@ -18,12 +36,16 @@ def findmarker(image: object, marker_name: str):
 
     for i in range(len(doc)):
         for img in doc.getPageImageList(i):
-            xref = img[0]
-            pix = fitz.Pixmap(doc, xref)
 
-            pix_list.append(pix)
-            pix_size.append(pix.size)
-            pix = None
+            if 'Separation' in img:
+                continue
+
+            xref = img[0]
+
+            image, metric = get_pix()
+            if image not in pix_list:
+                pix_list.append(image)
+                pix_size.append(metric)
 
     if not pix_size:
         print(f"n\Didn't find any picture at {image}")
@@ -32,16 +54,16 @@ def findmarker(image: object, marker_name: str):
     if not os.path.exists(folder_name):
         os.mkdir(folder_name)
 
+    #if pixmap:
+    #    idx = np.argmax(pix_size)
+    #    pix = pix_list[idx]
+    #    pix.writeImage("%s%s_%s.jpg" % (folder_name, marker_name, name_image))
+     #   pix = None
+    #else:
     idx = np.argmax(pix_size)
-    pix = pix_list[idx]
+    image = pix_list[idx]
+    image.save(open("%s%s_%s.jpg" % (folder_name, marker_name, name_image), "wb"))
 
-    if pix.n < 5:  # can be saved as PNG
-        pix.writeImage("%s%s_%s.jpg" % (folder_name, marker_name, name_image))
-    else:  # must convert the CMYK first
-        pix0 = fitz.Pixmap(fitz.csRGB, pix)
-        pix0.writeImage("%s%s_%s.png" % (folder_name, marker_name, name_image))
-        pix0 = None  # free Pixmap resources
-    pix = None
     return 0
 
 def main(folder_name: str, marker_name: str):

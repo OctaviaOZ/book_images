@@ -6,24 +6,64 @@
 		"resize": 300
 		}
   ,
+	"ital_30_ukr":
+		{
+		"thresh": 50,
+		"octaves": 2,
+		"resize": 300
+		},
+	"ital_30_rus":
+		{
+		"thresh": 50,
+		"octaves": 2,
+		"resize": 300
+		},
   "germ_20_ukr":
 		{
 		"thresh": 30,
 		"octaves": 2,
 		"resize": 400
-		}
-  ,
+		},
+	"germ_20_rus":
+		{
+		"thresh": 30,
+		"octaves": 2,
+		"resize": 400
+		},
   "fran_30_ukr":
 		{
 		"thresh": 50,
 		"octaves": 2,
 		"resize": 300
 		},
-
-   "fran_30_rus":
+  "fran_30_rus":
 		{
 		"thresh": 50,
 		"octaves": 2,
 		"resize": 300
+		},
+  "ital_rus":
+		{
+		"thresh": 30,
+		"octaves": 2,
+		"resize": 400
+		},
+  "ital_ukr":
+		{
+		"thresh": 30,
+		"octaves": 2,
+		"resize": 400
+		},
+	"spain_ukr":
+		{
+		"thresh": 30,
+		"octaves": 2,
+		"resize": 400
+		},
+	"spain_rus":
+		{
+		"thresh": 30,
+		"octaves": 2,
+		"resize": 400
 		}
 }

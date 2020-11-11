@@ -42,3 +42,8 @@ def resize(image: object = None, scale_factor: int = 300):
     #    ow = int(scale_factor * w / h)
     #return cv.resize(image, (oh, ow), cv.INTER_LINEAR)
     return cv.resize(image, None, None, scale, scale, cv.INTER_LINEAR)# cv.INTER_NEAREST)# cv.INTER_LINEAR)
+
+def rgb2gray(rgb):
+    #if img.shape == 3
+    fil = [0.299, 0.587, 0.144]
+    #return np.dot(rgb, fil)

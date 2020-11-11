@@ -5,3 +5,4 @@ opencv-python == 4.4.0
 pickle
 fitz
 PyMuPDF
+PIL
