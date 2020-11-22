@@ -23,7 +23,7 @@ def main(folder_name: str):
     #cv_file = cv.FileStorage(image_path + folder_name + '.xml', cv.FILE_STORAGE_WRITE)
     #cv_file.startWriteStruct('Mapping', cv.FileNode_MAP)
 
-    thresh, octaves, size = get_parameters(folder_name)
+    thresh, octaves, size, ext_of_files = get_parameters(folder_name)
 
     if not thresh:
         return 1
@@ -33,7 +33,7 @@ def main(folder_name: str):
     all_images_to_compare = []
     files = os.listdir(IMAGE_PATH)
     for f in files:
-            if f.endswith('.jpg'):
+            if f.endswith(ext_of_files):
 
                 image = cv.imread(IMAGE_PATH + f, 1)
                 image = resize(image, size)

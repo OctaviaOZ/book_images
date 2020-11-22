@@ -1,69 +1,80 @@
 {
   "covers":
 		{
-		"thresh": 50,
+		"thresh": 30,
 		"octaves": 2,
-		"resize": 300
+		"resize": 300,
+		"extension": "jpg"
 		}
   ,
 	"ital_30_ukr":
 		{
 		"thresh": 50,
 		"octaves": 2,
-		"resize": 300
+		"resize": 300,
+		"extension": "jpg"
 		},
 	"ital_30_rus":
 		{
 		"thresh": 50,
 		"octaves": 2,
-		"resize": 300
+		"resize": 300,
+		"extension": "jpg"
 		},
   "germ_20_ukr":
 		{
 		"thresh": 30,
 		"octaves": 2,
-		"resize": 400
+		"resize": 400,
+		"extension": "jpg"
 		},
 	"germ_20_rus":
 		{
 		"thresh": 30,
 		"octaves": 2,
-		"resize": 400
+		"resize": 400,
+		"extension": "jpg"
 		},
   "fran_30_ukr":
 		{
 		"thresh": 50,
 		"octaves": 2,
-		"resize": 300
+		"resize": 300,
+		"extension": "jpg"
 		},
   "fran_30_rus":
 		{
 		"thresh": 50,
 		"octaves": 2,
-		"resize": 300
+		"resize": 300,
+		"extension": "jpg"
 		},
   "ital_rus":
 		{
-		"thresh": 30,
+		"thresh": 50,
 		"octaves": 2,
-		"resize": 400
+		"resize": 500,
+		"extension": "jpg"
 		},
   "ital_ukr":
 		{
 		"thresh": 30,
 		"octaves": 2,
-		"resize": 400
+		"resize": 400,
+		"extension": "png"
 		},
 	"spain_ukr":
 		{
 		"thresh": 30,
 		"octaves": 2,
-		"resize": 400
+		"resize": 400,
+		"extension": "png"
 		},
 	"spain_rus":
 		{
 		"thresh": 30,
 		"octaves": 2,
-		"resize": 400
+		"resize": 400,
+		"extension": "png"
 		}
 }

@@ -143,7 +143,9 @@ class Book:
                     if not self.isfolder:
                         return str(titles[idx])
                 else:
+                    end = timer()
                     print("{0} no similarity".format(str(self.image)))
+                    print('find_match_time: ', (end - start))
             else:
                 print("\n{0} has not points".format(str(image)))
 
@@ -160,9 +162,9 @@ class Book:
         flann = cv.FlannBasedMatcher(self.index_params, {})
 
         if self.iscover:
-            thresh, octaves, size = get_parameters("covers")
+            thresh, octaves, size, ext_of_files = get_parameters("covers")
         else:
-            thresh, octaves, size = get_parameters(self.current_book)
+            thresh, octaves, size, ext_of_files = get_parameters(self.current_book)
 
         if not thresh:
             return ""
@@ -173,7 +175,7 @@ class Book:
 
             files = os.listdir(self.image)
             for f in files:
-                if f.endswith('.jpg'):
+                if f.endswith(ext_of_files):
                     findmacth(str(image) + "\\" + f)
             # cv_file.release()
         else:

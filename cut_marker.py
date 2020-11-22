@@ -1,6 +1,6 @@
 import argparse
 import os
-from settings.parameters import OUTPUT_FOLDER, OUTPUT_FOLDER_IMAGES
+from settings.parameters import OUTPUT_FOLDER, OUTPUT_FOLDER_IMAGES, get_parameters
 import fitz
 import numpy as np
 from PIL import Image
@@ -15,19 +15,18 @@ def findmarker(image: object, marker_name: str):
         if 'DeviceCMYK' in base_image['cs-name']:
 
             if 'Indexed' in base_image['cs-name']:
-                metric = image.entropy()/2
+                metric = image.entropy()*2*(-1.0)
             else:
-                metric = image.entropy()
+                metric = image.entropy()*(-1.0)
         else:
+            print(name_image)
             metric = image.height * image.width
 
         return image, metric
 
-
     name_image = os.path.basename(image).split('.')[0]
-    #split_name = os.path.split(image)
-    #name_image = split_name[1].split('.')[0]
     folder_name = OUTPUT_FOLDER_IMAGES+'\\'+marker_name+'\\'
+    _, _, _, ext_of_files = get_parameters(folder_name)
 
     doc = fitz.open(image)
 
@@ -62,7 +61,7 @@ def findmarker(image: object, marker_name: str):
     #else:
     idx = np.argmax(pix_size)
     image = pix_list[idx]
-    image.save(open("%s%s_%s.jpg" % (folder_name, marker_name, name_image), "wb"))
+    image.save(open("%s%s_%s.%s" % (folder_name, marker_name, name_image, ext_of_files), "wb"))
 
     return 0
 

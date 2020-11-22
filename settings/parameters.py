@@ -17,7 +17,7 @@ def get_parameters(book: str):
         resp_dict = json.load(f)
         book_dict = resp_dict.get(book, None)
         if book_dict:
-            return book_dict['thresh'], book_dict['octaves'], book_dict['resize']
+            return book_dict['thresh'], book_dict['octaves'], book_dict['resize'], book_dict['extension']
         else:
             print("\nDid not find parameters in specifications for book", book)
             return 0, 0, 0
