@@ -14,8 +14,12 @@ def findmarker(image: object, marker_name: str):
         base_image = doc.extractImage(xref)
         image_bytes = base_image["image"]
         image = Image.open(io.BytesIO(image_bytes))
+        if 'DeviceCMYK' in base_image['cs-name']:
+            number_points = 1500
+        else:
+            number_points = 700
 
-        return image
+        return image, number_points
 
     name_image = os.path.basename(image).split('.')[0]
     folder_name = OUTPUT_FOLDER_IMAGES+'\\'+marker_name+'\\'
@@ -45,7 +49,7 @@ def findmarker(image: object, marker_name: str):
             xref = img[0]
 
 
-            image = get_pix()
+            image, number_points = get_pix()
             if image not in pix_list:
                 pix_list_append(image)
 
@@ -66,12 +70,13 @@ def findmarker(image: object, marker_name: str):
 
         if desc is not None:
             pix_size_append(len(desc))
+            print("Number of points", len(desc))
         else:
             pix_size_append(0)
 
     idx = argmax(pix_size)
 
-    if pix_size[idx] < 2000:
+    if pix_size[idx] < number_points:
         idx = len(pix_size)
         print(f"Didn't find a picture at {name_image} with the appropriate quality!!! Need more pdf-s pages\n")
 
