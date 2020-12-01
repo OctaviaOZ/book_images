@@ -1,22 +1,22 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-from settings.parameters import COVERS_FOLDER, OUTPUT_FOLDER_IMAGES, resize, get_parameters
-import cv2 as cv  # '4.4.0'
+from settings.parameters import COVERS_FOLDER, OUTPUT_FOLDER_IMAGES, get_parameters, get_points
 import argparse
 import os
-import numpy as np
-import pickle
+from numpy import argmax
+from pickle import load
 from timeit import default_timer as timer
+from cv2 import imread, BRISK_create, FlannBasedMatcher
 
 
 class Book:
     def __init__(self, image, isfolder, iscover):
-        self.current_book = ""
+        self.current_book = None
         self.image = image
         self.isfolder = isfolder
         self.iscover = iscover
-        self.descriptions = ""
+        self.descriptions = None
         self.threshold = 0.7
         self.index_params = dict(algorithm=6, table_number=6, key_size=12, multi_probe_level=1)
 
@@ -63,7 +63,7 @@ class Book:
         image_path = OUTPUT_FOLDER_IMAGES + "\\" + book_folder + "\\"
         if not os.path.exists(image_path):
             print("\n{0} not exists".format(image_path))
-            return ""
+            return None
         # Getting back the objects:
         return f"{image_path}{self.current_book}.pickle"
 
@@ -71,7 +71,7 @@ class Book:
     def getcover(self):
         if not os.path.exists(COVERS_FOLDER):
             print("\n{0}  not exists".format(COVERS_FOLDER))
-            return ""
+            return None
         # Getting back the objects:
         return f"{COVERS_FOLDER}\\covers.pickle"
 
@@ -85,35 +85,15 @@ class Book:
             print('\nprocessing', str(image_file))
             start = timer()
 
-            original = cv.imread(image_file, 1)
-
-            #1: cv2.IMREAD_COLOR
-            #0: cv2.IMREAD_GRAYSCALE
-
-            if original is None:
-                print('\n' + image_file + " didn't find")
-                return ""
-
-            original = resize(original, size)
-            original = cv.cvtColor(original, cv.COLOR_BGR2GRAY)
-
-            #original = cv.Canny(original, 100, 200)
-            #original = cv.equalizeHist(original)
-
-            original[0] = original[0] / 255.
-            original[1] = original[1] / 255.
-
-            # Apply gamma correction.
-            #original[0] = np.array(255 * (original[0] / 255) ** GAMMA, dtype='uint8')
-            #original[1] = np.array(255 * (original[1] / 255) ** GAMMA, dtype='uint8')
-
-            _, desc_1 = brisk.detectAndCompute(original, None)
+            desc_1 = get_points(image_file, "", size, brisk)
 
             if desc_1 is not None:
+
                 titles = []
                 similarity = []
+                titles_append = titles.append
+                similarity_append = similarity.append
 
-                # for title in root.keys():
                 for title, desc_2, len_desc_2 in root:
 
                     good_points = 0
@@ -128,14 +108,14 @@ class Book:
                     percentage_similarity = good_points / len_desc_2 * 100
 
                     if percentage_similarity > 2:
-                        titles.append(title)
-                        similarity.append(percentage_similarity)
+                        titles_append(title)
+                        similarity_append(percentage_similarity)
 
                 if similarity:
-                    idx = np.argmax(similarity)
-                    #for idx1, t in enumerate(titles):
+                    idx = argmax(similarity)
+                    # for idx1, t in enumerate(titles):
                     print("Info: " + str(titles[idx]))
-                    #print("percentage_similarity: {0}".format(str(similarity[idx])))
+                    # print("percentage_similarity: {0}".format(str(similarity[idx])))
 
                     end = timer()
                     print('find_match_time: ', (end - start))
@@ -150,16 +130,16 @@ class Book:
                 print("\n{0} has not points".format(str(image)))
 
             if not self.isfolder:
-                return ""
+                return None
 
         if not os.path.exists(self.descriptions):
             print("\nDid not find file {}".format(self.descriptions))
-            return ""
+            return None
 
         with open(self.descriptions, 'rb') as handle:
-            root = pickle.load(handle)
+            root = load(handle)
 
-        flann = cv.FlannBasedMatcher(self.index_params, {})
+        flann = FlannBasedMatcher(self.index_params, {})
 
         if self.iscover:
             thresh, octaves, size, ext_of_files = get_parameters("covers")
@@ -167,9 +147,9 @@ class Book:
             thresh, octaves, size, ext_of_files = get_parameters(self.current_book)
 
         if not thresh:
-            return ""
+            return None
 
-        brisk = cv.BRISK_create(thresh, octaves)  # norm = cv.NORM_HAMMING (70,2) 30days
+        brisk = BRISK_create(thresh, octaves)  # norm = cv.NORM_HAMMING (70,2) 30days
 
         if self.isfolder:
 
@@ -183,7 +163,7 @@ class Book:
             # cv_file.release()
             return cur_book
 
-        return ""
+        return None
 
 
 def main(image_name: str = None, isfolder: bool = False, iscover: bool = False):

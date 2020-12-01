@@ -58,23 +58,23 @@
 		},
   "ital_ukr":
 		{
-		"thresh": 30,
+		"thresh": 50,
 		"octaves": 2,
-		"resize": 400,
-		"extension": "png"
+		"resize": 500,
+		"extension": "jpg"
 		},
 	"spain_ukr":
 		{
-		"thresh": 30,
+		"thresh": 50,
 		"octaves": 2,
-		"resize": 400,
-		"extension": "png"
+		"resize": 500,
+		"extension": "jpg"
 		},
 	"spain_rus":
 		{
-		"thresh": 30,
+		"thresh": 50,
 		"octaves": 2,
-		"resize": 400,
-		"extension": "png"
+		"resize": 500,
+		"extension": "jpg"
 		}
 }

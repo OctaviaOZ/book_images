@@ -1,10 +1,10 @@
 # python 3.7.8
 import argparse
 import os
-from settings.parameters import OUTPUT_FOLDER_IMAGES, resize, get_parameters
-import cv2 as cv  # '4.4.0'
-import numpy as np
+from settings.parameters import OUTPUT_FOLDER_IMAGES, get_parameters, get_points
+from numpy import array
 import pickle
+from cv2 import BRISK_create
 
 IMAGE_PATH = ''
 
@@ -20,48 +20,27 @@ def main(folder_name: str):
 
     """
 
-    #cv_file = cv.FileStorage(image_path + folder_name + '.xml', cv.FILE_STORAGE_WRITE)
-    #cv_file.startWriteStruct('Mapping', cv.FileNode_MAP)
-
     thresh, octaves, size, ext_of_files = get_parameters(folder_name)
 
-    if not thresh:
+    if not ext_of_files:
         return 1
 
-    brisk = cv.BRISK_create(thresh, octaves)  # norm = cv.NORM_HAMMING (70,2) 30days (30, 4) 20days
+    brisk = BRISK_create(thresh, octaves)
 
     all_images_to_compare = []
+    all_images_to_compare_append = all_images_to_compare.append
     files = os.listdir(IMAGE_PATH)
     for f in files:
             if f.endswith(ext_of_files):
 
-                image = cv.imread(IMAGE_PATH + f, 1)
-                image = resize(image, size)
-                #image = cv.Canny(image, 50, 100)
-
-                image = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
-
-                image[0] = image[0] / 255.
-                image[1] = image[1] / 255.
-
-                # Apply gamma correction.
-                #image[0] = np.array(255 * (image[0] / 255) ** GAMMA, dtype='uint8')
-                #image[1] = np.array(255 * (image[1] / 255) ** GAMMA, dtype='uint8')
-
-                _, desc = brisk.detectAndCompute(image, None)
+                desc = get_points(IMAGE_PATH, f, size, brisk)
                 if desc is not None:
-                    all_images_to_compare.append((os.path.splitext(f)[0], desc, len(desc)))
-                    #print(len(desc))
+                    all_images_to_compare_append((os.path.splitext(f)[0], desc, len(desc)))
                 else:
                     print("impossible to find point", IMAGE_PATH + f)
 
-    #cv_file.endWriteStruct()
-    #cv_file.release()
     with open(IMAGE_PATH + folder_name + '.pickle', 'wb') as handle:
-        pickle.dump(np.array(all_images_to_compare, dtype=object), handle, protocol=pickle.HIGHEST_PROTOCOL)
-
-    #with open(IMAGE_PATH + folder_name + '.npy', 'wb') as handle_file:
-    #    np.save(handle_file, np.array(all_images_to_compare, dtype=object), allow_pickle=True)
+        pickle.dump(array(all_images_to_compare, dtype=object), handle, protocol=pickle.HIGHEST_PROTOCOL)
 
     print("\nDescriptor's file is saved as", "{0}{1}.pickle".format(IMAGE_PATH, folder_name))
 
