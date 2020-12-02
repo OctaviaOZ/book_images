@@ -26,7 +26,7 @@ def findmarker(image: object, marker_name: str):
     thresh, octaves, size, ext_of_files = get_parameters(marker_name)
 
     if not ext_of_files:
-        return 1
+        return False, marker_name
 
     brisk = BRISK_create(thresh, octaves)
 
@@ -55,7 +55,7 @@ def findmarker(image: object, marker_name: str):
 
     if not pix_list:
         print(f"\nDidn't find any picture at {name_image}")
-        return 1
+        return False, name_image
 
     if not os.path.exists(folder_name):
         os.mkdir(folder_name)
@@ -76,9 +76,11 @@ def findmarker(image: object, marker_name: str):
 
     idx = argmax(pix_size)
 
+    find_picture = True
     if pix_size[idx] < number_points:
         idx = len(pix_size)
         print(f"Didn't find a picture at {name_image} with the appropriate quality!!! Need more pdf-s pages\n")
+        find_picture = False
 
     for j in range(len(pix_size)):
 
@@ -90,7 +92,8 @@ def findmarker(image: object, marker_name: str):
             "%s%s_%s_%s.%s" % (folder_name, marker_name, name_image, idx, ext_of_files), \
             "%s%s_%s.%s" % (folder_name, marker_name, name_image, ext_of_files))
 
-    return 0
+    return find_picture, name_image
+
 
 def main(folder_name: str, marker_name: str):
 
@@ -98,13 +101,22 @@ def main(folder_name: str, marker_name: str):
 
     if isfolder:
 
+        find_picture_false = []
+        find_picture_false_append = find_picture_false.append
+
         files = os.listdir(folder_name)
         for f in files:
             if f.endswith('pdf'):
-                findmarker(folder_name + "\\" + f, marker_name)
+
+                find_picture, name_image = findmarker(folder_name + "\\" + f, marker_name)
+                if not find_picture:
+                    find_picture_false_append(name_image)
+
+        if  find_picture_false:
+            print(f"List of pages for refinding for {marker_name}:", find_picture_false)
 
     else:
-        findmarker(folder_name, marker_name)
+        _, _ = findmarker(folder_name, marker_name)
 
 
 if __name__ == '__main__':
