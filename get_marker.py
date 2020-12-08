@@ -7,7 +7,7 @@ import os
 from numpy import argmax
 from pickle import load
 from timeit import default_timer as timer
-from cv2 import imread, BRISK_create, FlannBasedMatcher
+from cv2 import BRISK_create, FlannBasedMatcher
 
 
 class Book:
@@ -24,7 +24,7 @@ class Book:
     def get_cur_book(self):
 
         if self.iscover:
-            self.descriptions = self.getcover
+            self.descriptions = self.getcover()
             if self.descriptions:
                 self.current_book = self.getmarker(self.image)
                 if self.current_book:
@@ -35,10 +35,10 @@ class Book:
                     return 0
                 else:
                     print('\nDidn`t recognise the cover\n')
-                    return 1
+                    exit()
             else:
                 print('\nDidn`t find the file with descriptions of covers in the folder', COVERS_FOLDER)
-                return 1
+                exit()
 
         if os.path.exists(COVERS_FOLDER + "\\current_book.txt"):
             with open(COVERS_FOLDER + "\\current_book.txt", 'r') as f:
@@ -46,18 +46,16 @@ class Book:
 
         if not self.current_book:
             print('\nDidn`t find the current book, scan the cover of the chosen book with argument')
-            return 1
+            exit()
 
         print('\nThe current book is', self.current_book)
-        self.descriptions = self.getbook
+        self.descriptions = self.getbook()
         if self.descriptions:
-            _ = self.getmarker(self.image)
-            return 0
+            return self.getmarker(self.image)
         else:
             print('\nDidn`t find the file with descriptions of boook`s pages in the folder', self.current_book)
-            return 1
+            exit()
 
-    @property
     def getbook(self):
         book_folder = self.current_book
         image_path = OUTPUT_FOLDER_IMAGES + "\\" + book_folder + "\\"
@@ -67,21 +65,17 @@ class Book:
         # Getting back the objects:
         return f"{image_path}{self.current_book}.pickle"
 
-    @property
     def getcover(self):
+
         if not os.path.exists(COVERS_FOLDER):
             print("\n{0}  not exists".format(COVERS_FOLDER))
             return None
         # Getting back the objects:
         return f"{COVERS_FOLDER}\\covers.pickle"
 
-    def getmarker(self, image: object) -> str:
-        """
-        result of mathing of some pages
-        :return: print result statment, name_book(page)
-        """
+    def getmarker(self, image: object):
 
-        def findmacth(image_file):
+       def findmacth(image_file):
             print('\nprocessing', str(image_file))
             start = timer()
 
@@ -132,42 +126,42 @@ class Book:
             if not self.isfolder:
                 return None
 
-        if not os.path.exists(self.descriptions):
-            print("\nDid not find file {}".format(self.descriptions))
-            return None
+       if not os.path.exists(self.descriptions):
+           print("\nDid not find file {}".format(self.descriptions))
+           return None
 
-        with open(self.descriptions, 'rb') as handle:
-            root = load(handle)
+       with open(self.descriptions, 'rb') as handle:
+           root = load(handle)
 
-        flann = FlannBasedMatcher(self.index_params, {})
+       flann = FlannBasedMatcher(self.index_params, {})
 
-        if self.iscover:
+       if self.iscover:
             thresh, octaves, size, ext_of_files = get_parameters("covers")
-        else:
+       else:
             thresh, octaves, size, ext_of_files = get_parameters(self.current_book)
 
-        if not thresh:
-            return None
+       if not thresh:
+           return None
 
-        brisk = BRISK_create(thresh, octaves)  # norm = cv.NORM_HAMMING (70,2) 30days
+       brisk = BRISK_create(thresh, octaves)  # norm = cv.NORM_HAMMING (70,2) 30days
 
-        if self.isfolder:
+       if self.isfolder:
 
             files = os.listdir(self.image)
             for f in files:
                 if f.endswith(ext_of_files):
                     findmacth(str(image) + "\\" + f)
             # cv_file.release()
-        else:
+       else:
             cur_book = findmacth(image)
             # cv_file.release()
             return cur_book
 
-        return None
+       return None
 
 
-def main(image_name: str = None, isfolder: bool = False, iscover: bool = False):
-    Book(image_name, isfolder, iscover).get_cur_book
+def main(name: str = None, isfolder: bool = False, iscover: bool = False):
+    Book(name, isfolder, iscover).get_cur_book
 
 
 if __name__ == '__main__':
@@ -185,6 +179,6 @@ if __name__ == '__main__':
         if args.cover:
             cover = bool(args.cover)
 
-        main(image_name=image_name, isfolder=os.path.isdir(image_name), iscover=cover)
+        main(name=image_name, isfolder=os.path.isdir(image_name), iscover=cover)
     else:
         print("\nDid not find image_name argument")

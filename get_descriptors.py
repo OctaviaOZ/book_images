@@ -23,7 +23,7 @@ def main(folder_name: str):
     thresh, octaves, size, ext_of_files = get_parameters(folder_name)
 
     if not ext_of_files:
-        return 1
+        exit()
 
     brisk = BRISK_create(thresh, octaves)
 
