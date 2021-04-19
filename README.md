@@ -25,7 +25,7 @@ python cut_marker.py --folder_name <folder includes pdf pages> --marker_name <sh
 \Books_images> python cut_marker.py --folder_name images\20_minut_Germany-ukr --marker_name germ_20_ukr
 ```
    Функція знаходить картинки у pdf, аналізує кількість точок для розпізнавання, вибирає 
-   з найбільшою кількістю тщточок. 
+   з найбільшою кількістю точок. 
    Всі картинки по сторінках зберігаються у папці з ім'ям pdf у загальній папці "images". Якщо папку не знайдено, функція її створить.
    Папка з pdf повинна включати в себе тільки сторінки для аналізу (тобто 1,2,3...). 
     
@@ -60,9 +60,9 @@ python get_marker.py --folder_name <folder/image> / --cover <true>
    Приклади:
 
 ```bash
-	python get_marker.py --folder_name test\pages
-	python get_marker.py --folder_name test\pages\20201028_203639.jpg
-	python get_marker.py --folder_name test\20201028_203639.jpg --cover true
+python get_marker.py --folder_name test\pages
+python get_marker.py --folder_name test\pages\20201028_203639.jpg
+python get_marker.py --folder_name test\20201028_203639.jpg --cover true
 ```
    Передається папка чи файл в аргументі --folder_name. Якщо це обкладинка передається додатковий параметр --cover True, в іншому впадку він не об'язковий.
    Файли приймаються у форматі jpg.
