@@ -22,10 +22,11 @@ def findmarker(image: object, marker_name: str):
         return image, number_points
 
     name_image = os.path.basename(image).split('.')[0]
-    folder_name = OUTPUT_FOLDER_IMAGES+'\\'+marker_name+'\\'
+    folder_name = OUTPUT_FOLDER_IMAGES+'/'+marker_name+'/'
     thresh, octaves, size, ext_of_files = get_parameters(marker_name)
 
     if not ext_of_files:
+        print(f"\nDodn't exist specifications parameters at {marker_name}")
         return False, marker_name
 
     brisk = BRISK_create(thresh, octaves)
@@ -131,7 +132,7 @@ if __name__ == '__main__':
 
         if args.marker_name:
 
-            image_name = OUTPUT_FOLDER + "\\" + args.folder_name
+            image_name = OUTPUT_FOLDER + "/" + args.folder_name
 
             main(folder_name=image_name, marker_name=args.marker_name)
         else:

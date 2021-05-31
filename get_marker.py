@@ -35,10 +35,10 @@ class Book:
                     return 0
                 else:
                     print('\nDidn`t recognise the cover\n')
-                    exit()
+                    exit(1)
             else:
                 print('\nDidn`t find the file with descriptions of covers in the folder', COVERS_FOLDER)
-                exit()
+                exit(1)
 
         if os.path.exists(COVERS_FOLDER + "\\current_book.txt"):
             with open(COVERS_FOLDER + "\\current_book.txt", 'r') as f:
@@ -46,7 +46,7 @@ class Book:
 
         if not self.current_book:
             print('\nDidn`t find the current book, scan the cover of the chosen book with argument')
-            exit()
+            exit(1)
 
         print('\nThe current book is', self.current_book)
         self.descriptions = self.getbook()
@@ -54,7 +54,7 @@ class Book:
             return self.getmarker(self.image)
         else:
             print('\nDidn`t find the file with descriptions of boook`s pages in the folder', self.current_book)
-            exit()
+            exit(1)
 
     def getbook(self):
         book_folder = self.current_book
@@ -150,7 +150,7 @@ class Book:
             files = os.listdir(self.image)
             for f in files:
                 if f.endswith(ext_of_files):
-                    findmacth(str(image) + "\\" + f)
+                    findmacth(str(image) + "/" + f)
             # cv_file.release()
        else:
             cur_book = findmacth(image)
@@ -173,7 +173,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     if args.folder_name:
-        image_name = OUTPUT_FOLDER_IMAGES + "\\" + args.folder_name
+        image_name = OUTPUT_FOLDER_IMAGES + "/" + args.folder_name
 
         cover = False
         if args.cover:
